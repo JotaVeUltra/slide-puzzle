@@ -15,6 +15,19 @@
 #        drawn board
 #        drawn tiles animation
 
+import os
+
+
+def get_images():
+    """
+    Returns a list of the names of each file that has a bmp extension.
+    """
+    return [
+        name
+        for name in os.listdir(os.path.join("resources", "graphics"))
+        if name[-3:].lower() in "bmp"
+    ]
+
 
 def main():
     pass
