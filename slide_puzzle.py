@@ -33,6 +33,7 @@ def get_images():
 
 def main():
     pg.init()
+    clock = pg.time.Clock()
     screen = pg.display.set_mode((400, 400), 0, 32)
     images = get_images()
     board_image = pg.image.load(images[0]).convert()
@@ -48,7 +49,7 @@ def main():
             if event.type == pg.QUIT:
                 pg.quit()
                 raise SystemExit
-
+        clock.tick(30)
 
 if __name__ == "__main__":
     main()
