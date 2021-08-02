@@ -1,16 +1,8 @@
 # TODO:
 # check number of images inside the folder
 # if there are more than one image ask the player to choose
-# randomize the tiles and check if solvable
 # game loop
-#    check for player actions
-#        mouse click or arrows pressed
-#    handle events
-#        check if tile can be moved
-#        change status of tile moved tile
-#        checke if player win
 #    update screen
-#        drawn board
 #        drawn tiles animation
 
 import os
@@ -37,19 +29,30 @@ def main():
     screen = pg.display.set_mode((400, 400), 0, 32)
     images = get_images()
     board_image = pg.image.load(images[0]).convert()
-
     puzzle_image = PuzzleImage(board_image, 4, 100)
-    puzzle_image.update()
-    puzzle_image.draw(screen)
-
-    pg.display.update()
 
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
                 raise SystemExit
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_UP:
+                    puzzle_image.move_tile("up")
+                if event.key == pg.K_DOWN:
+                    puzzle_image.move_tile("down")
+                if event.key == pg.K_LEFT:
+                    puzzle_image.move_tile("left")
+                if event.key == pg.K_RIGHT:
+                    puzzle_image.move_tile("right")
+
+        screen.fill((0, 0, 0))
+        puzzle_image.update()
+        puzzle_image.draw(screen)
+
+        pg.display.update()
         clock.tick(30)
+
 
 if __name__ == "__main__":
     main()

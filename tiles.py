@@ -35,8 +35,8 @@ def as_grid(array, board_size):
     return [array[i : i + board_size] for i in range(0, len(array), board_size)]
 
 
-def randomize_tiles_positions(board_size):
-    """Returns a random list of tiles positions."""
+def get_positions_dict(board_size):
+    """Returns a dictionary with the positions of each tile in the puzzle."""
     number_of_tiles = board_size ** 2
     current_tile = 1
     positions = {}
@@ -46,10 +46,14 @@ def randomize_tiles_positions(board_size):
             current_tile += 1
             if current_tile == number_of_tiles:
                 current_tile = 0  # blank tile
+    return positions
+
+
+def randomize_tiles_positions(board_size):
+    """Returns a random list of tiles positions."""
+    positions = get_positions_dict(board_size)
     keys = list(positions.keys())
     while True:
         shuffle(keys)
         if check_solvability(as_grid(keys, board_size)):
-            break
-    tiles = [positions[x] for x in keys]
-    return tiles
+            return keys
