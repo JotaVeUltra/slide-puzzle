@@ -1,3 +1,6 @@
+from random import shuffle
+
+
 def count_inversions(array, blank):
     """Returns the number of inversions in a list ignoring the blank value."""
     count = 0
@@ -25,3 +28,28 @@ def check_solvability(grid, blank=0):
         return not inversions % 2
     blank_pos = find_blank_position(grid, blank)
     return blank_pos % 2 != inversions % 2
+
+
+def as_grid(array, board_size):
+    """Convert a 1D array into a 2D array with given board size."""
+    return [array[i : i + board_size] for i in range(0, len(array), board_size)]
+
+
+def randomize_tiles_positions(board_size):
+    """Returns a random list of tiles positions."""
+    number_of_tiles = board_size ** 2
+    current_tile = 1
+    positions = {}
+    for y in range(board_size):
+        for x in range(board_size):
+            positions[current_tile] = (x, y)
+            current_tile += 1
+            if current_tile == number_of_tiles:
+                current_tile = 0  # blank tile
+    keys = list(positions.keys())
+    while True:
+        shuffle(keys)
+        if check_solvability(as_grid(keys, board_size)):
+            break
+    tiles = [positions[x] for x in keys]
+    return tiles
