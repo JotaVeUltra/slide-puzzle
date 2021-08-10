@@ -120,9 +120,70 @@ class Tile(pg.sprite.Sprite):
 
     def update(self, *args):
         """Update the position of the tile"""
+        super().update(*args)
         self.rect = pg.Rect(
             self.position[0] * self.size,
             self.position[1] * self.size,
             self.size,
             self.size,
         )
+
+
+class ThumbnailGroup(pg.sprite.Group):
+    """Container class for thumbnails"""
+
+    def __init__(self, images, *sprites):
+        super().__init__(*sprites)
+        x, y = 0, 0
+        while len(images):
+            self.add(Thumbnail(images.pop(), (x, y), 0))
+            x += 1
+            if x == 4:
+                x = 0
+                y += 1
+        self.scroll_position = 0
+        self.max_scroll_position = max(0, y - 4)
+
+
+class Thumbnail(pg.sprite.Sprite):
+    """Sprite class of thumbnails"""
+
+    def __init__(self, image, position, scroll, *groups):
+        super().__init__(*groups)
+        self.full_image = image
+        self.image = pg.transform.scale(image, (80, 80))
+        self.rect = pg.Rect(0, 0, 80, 80)
+        self.position = position
+        self.scroll = scroll
+
+    def update(self, scroll_position, *args):
+        """Update the position of the thumbnail"""
+        super().update(*args)
+        self.scroll = scroll_position
+        self.rect.x = 10 + 92 * self.position[0]
+        self.rect.y = 10 + 92 * (self.position[1] - self.scroll)
+
+
+class Scroll(pg.sprite.Sprite):
+    """Sprite class of scroll"""
+
+    def __init__(self, max_scroll, *groups) -> None:
+        super().__init__(*groups)
+        self.max_scroll = max_scroll
+        self.height = 380 / max_scroll
+        self.at = 0
+        self.rect = pg.Rect(380, 10, 15, self.height)
+
+    def up(self):
+        """Scroll up"""
+        self.at = max(self.at - 1, 0)
+        self.rect.y = 10 + (self.at * self.height)
+
+    def down(self):
+        """Scroll down"""
+        self.at = min(self.at + 1, self.max_scroll - 1)
+        self.rect.y = 10 + (self.at * self.height)
+
+    def draw(self, surface):
+        """Draw the scroll"""
+        pg.draw.rect(surface, (255, 255, 255), self.rect)

@@ -1,15 +1,9 @@
-# TODO:
-# check number of images inside the folder
-# if there are more than one image ask the player to choose
-# game loop
-#    update screen
-#        drawn tiles animation
-
+import math
 import os
 
 import pygame as pg
 
-from sprites import PuzzleImage
+from sprites import PuzzleImage, Scroll, ThumbnailGroup
 
 
 clock = pg.time.Clock()
@@ -33,12 +27,12 @@ def button(screen, position, text):
 
 def get_images():
     """
-    Returns a list of the names of each file that has a bmp extension.
+    Returns a list of the images in the folder
     """
     return [
-        os.path.join("resources", "graphics", name)
-        for name in os.listdir(os.path.join("resources", "graphics"))
-        if name[-3:].lower() in "bmp"
+        os.path.join("images", name)
+        for name in os.listdir(os.path.join("images"))
+        if name[-3:].lower() in ["bmp", "png", "jpg"]
     ]
 
 
@@ -85,15 +79,48 @@ def select_board_size(screen):
         clock.tick(30)
 
 
+def select_image_menu(screen, images):
+    """
+    Returns the selected image
+    """
+    global clock
+
+    scroll = Scroll(math.ceil((len(images) / 4) - 3))
+    menu = ThumbnailGroup(images[:])
+
+    while True:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                raise SystemExit
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                for thumb in menu.sprites():
+                    if thumb.rect.collidepoint((pg.mouse.get_pos())):
+                        return pg.transform.scale(thumb.full_image, (400, 400))
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if event.button == 4:
+                    scroll.up()
+                if event.button == 5:
+                    scroll.down()
+
+        screen.fill((0, 0, 0))
+        menu.update(scroll.at)
+        menu.draw(screen)
+        scroll.draw(screen)
+
+        pg.display.update()
+        clock.tick(30)
+
+
 def main():
     pg.init()
     global clock
     screen = pg.display.set_mode((400, 400), 0, 32)
 
-    images = get_images()
+    images = [pg.image.load(image).convert() for image in get_images()]
 
+    board_image = select_image_menu(screen, images)
     board_size = select_board_size(screen)
-    board_image = pg.image.load(images[0]).convert()
     puzzle_image = PuzzleImage(board_image, board_size)
 
     while True:
@@ -116,6 +143,7 @@ def main():
                 if event.key == pg.K_RIGHT:
                     puzzle_image.move_tile("right")
                 if event.key == pg.K_ESCAPE:
+                    board_image = select_image_menu(screen, images)
                     board_size = select_board_size(screen)
                     puzzle_image = PuzzleImage(board_image, board_size)
 
