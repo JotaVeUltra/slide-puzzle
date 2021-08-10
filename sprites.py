@@ -47,7 +47,7 @@ class PuzzleImage(pg.sprite.Group):
         """Draw all tiles on the surface"""
         super().draw(surface)
         if self.state == "won":
-            myfont = pg.font.SysFont(pg.font.get_default_font(), 60)
+            myfont = pg.font.SysFont("Arial", 60)
             textsurface = myfont.render("Win", False, (255, 0, 0))
             surface.blit(
                 textsurface,
