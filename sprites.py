@@ -11,33 +11,18 @@ class PuzzleImage(pg.sprite.Group):
         self.board_size = board_size
         self.state = "playing"
         tiles_positions = randomize_tiles_positions(board_size)
-        tile_size = screen_size / board_size
+        t_size = screen_size / board_size
         postions_dict = get_positions_dict(board_size)
         x, y = 0, 0
         for tile in tiles_positions:
-            tile_image = pg.Surface((tile_size, tile_size))
-            current_position = postions_dict[tile]
-            if current_position == (board_size - 1, board_size - 1):
+            tile_image = pg.Surface((t_size, t_size))
+            tile_pos = postions_dict[tile]
+            if tile_pos == (board_size - 1, board_size - 1):
                 self.blank_position = (x, y)
             else:
-                tile_image.blit(
-                    board_image,
-                    (0, 0),
-                    (
-                        tile_size * current_position[0],
-                        tile_size * current_position[1],
-                        tile_size,
-                        tile_size,
-                    ),
-                )
-                self.add(
-                    Tile(
-                        tile_image,
-                        tile_size,
-                        original_position=postions_dict[tile],
-                        position=(x, y),
-                    )
-                )
+                tile_rect = (t_size * tile_pos[0], t_size * tile_pos[1], t_size, t_size)
+                tile_image.blit(board_image, (0, 0), tile_rect)
+                self.add(Tile(tile_image, t_size, postions_dict[tile], (x, y)))
             x += 1
             if x == board_size:
                 x = 0
@@ -49,13 +34,9 @@ class PuzzleImage(pg.sprite.Group):
         if self.state == "won":
             myfont = pg.font.SysFont("Arial", 60)
             textsurface = myfont.render("Win", False, (255, 0, 0))
-            surface.blit(
-                textsurface,
-                (
-                    surface.get_width() / 2 - textsurface.get_width() / 2,
-                    surface.get_height() / 2,
-                ),
-            )
+            x = surface.get_width() / 2 - textsurface.get_width() / 2
+            y = surface.get_height() / 2
+            surface.blit(textsurface, (x, y))
 
     def update(self, *args):
         """Update the state of the puzzle"""
