@@ -6,11 +6,12 @@ from tiles import get_positions_dict, randomize_tiles_positions
 class PuzzleImage(pg.sprite.Group):
     """Container class for tiles"""
 
-    def __init__(self, board_image, board_size=4, tile_size=100, *sprites):
+    def __init__(self, board_image, board_size=4, screen_size=400, *sprites):
         super().__init__(*sprites)
         self.board_size = board_size
         self.state = "playing"
         tiles_positions = randomize_tiles_positions(board_size)
+        tile_size = screen_size / board_size
         postions_dict = get_positions_dict(board_size)
         x, y = 0, 0
         for tile in tiles_positions:
@@ -47,7 +48,7 @@ class PuzzleImage(pg.sprite.Group):
         super().draw(surface)
         if self.state == "won":
             myfont = pg.font.SysFont(pg.font.get_default_font(), 60)
-            textsurface = myfont.render("Won", False, (255, 0, 0))
+            textsurface = myfont.render("Win", False, (255, 0, 0))
             surface.blit(
                 textsurface,
                 (
