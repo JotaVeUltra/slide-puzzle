@@ -89,6 +89,22 @@ class PuzzleImage(pg.sprite.Group):
             if tile:
                 tile.position, self.blank_position = self.blank_position, tile.position
 
+    def try_move(self, tile):
+        """Try to move tiles in row or column"""
+        clicked_position = tile.position
+        if self.state == "playing":
+            x, y = self.blank_position
+            if tile.position[0] == x or tile.position[1] == y:
+                while self.blank_position != clicked_position:
+                    if tile.position[0] < x:
+                        self.move_tile("right")
+                    elif tile.position[0] > x:
+                        self.move_tile("left")
+                    elif tile.position[1] < y:
+                        self.move_tile("down")
+                    elif tile.position[1] > y:
+                        self.move_tile("up")
+
 
 class Tile(pg.sprite.Sprite):
     """Sprite class of tiles"""
@@ -103,4 +119,9 @@ class Tile(pg.sprite.Sprite):
 
     def update(self, *args):
         """Update the position of the tile"""
-        self.rect = self.position[0] * self.size, self.position[1] * self.size
+        self.rect = pg.Rect(
+            self.position[0] * self.size,
+            self.position[1] * self.size,
+            self.size,
+            self.size,
+        )

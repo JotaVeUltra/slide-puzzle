@@ -9,7 +9,7 @@ import os
 
 import pygame as pg
 
-from puzzle_sprites import PuzzleImage
+from sprites import PuzzleImage
 
 
 def get_images():
@@ -36,6 +36,11 @@ def main():
             if event.type == pg.QUIT:
                 pg.quit()
                 raise SystemExit
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                for tile in puzzle_image.sprites():
+                    if tile.rect.collidepoint((pg.mouse.get_pos())):
+                        puzzle_image.try_move(tile)
+                        break
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_UP:
                     puzzle_image.move_tile("up")
