@@ -116,6 +116,7 @@ def main():
     pg.init()
     global clock
     screen = pg.display.set_mode((400, 400), 0, 32)
+    pg.display.set_caption("Slide Puzzle")
 
     images = [pg.image.load(image).convert() for image in get_images()]
 
