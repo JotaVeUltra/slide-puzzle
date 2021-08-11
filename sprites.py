@@ -2,6 +2,8 @@ import pygame as pg
 
 from tiles import get_positions_dict, randomize_tiles_positions
 
+ANIMATION_TIME = 0.3
+
 
 class PuzzleImage(pg.sprite.Group):
     """Container class for tiles"""
@@ -34,16 +36,14 @@ class PuzzleImage(pg.sprite.Group):
         if self.state == "won":
             myfont = pg.font.SysFont("Arial", 60)
             textsurface = myfont.render("Win", False, (255, 0, 0))
-            x = surface.get_width() / 2 - textsurface.get_width() / 2
-            y = surface.get_height() / 2
-            surface.blit(textsurface, (x, y))
+            rect = textsurface.get_rect(center=surface.get_rect().center)
+            surface.blit(textsurface, rect)
 
-    def update(self, *args):
+    def update(self, delta, *args):
         """Update the state of the puzzle"""
-        super().update(*args)
         won = True
         for sprite in self.sprites():
-            sprite.update(*args)
+            sprite.update(delta, *args)
             if sprite.position != sprite.original_position:
                 won = False
         if won:
@@ -70,6 +70,7 @@ class PuzzleImage(pg.sprite.Group):
                 tile = self.get_tile(x - 1, y)
             if tile:
                 tile.position, self.blank_position = self.blank_position, tile.position
+                tile.animate()
 
     def try_move(self, tile):
         """Try to move tiles in row or column"""
@@ -95,19 +96,38 @@ class Tile(pg.sprite.Sprite):
         super().__init__(*groups)
         self.image = image
         self.rect = self.image.get_rect()
+        self.rect.center = 200, 200
         self.size = size
         self.original_position = original_position
         self.position = position
+        self.animate()
 
-    def update(self, *args):
+    def update(self, delta, *args):
         """Update the position of the tile"""
         super().update(*args)
-        self.rect = pg.Rect(
-            self.position[0] * self.size,
-            self.position[1] * self.size,
-            self.size,
-            self.size,
-        )
+        if self.animation:
+            self.elapsed_time += delta
+            if self.elapsed_time >= ANIMATION_TIME:
+                self.animation = False
+            else:
+                self.rect.x = self.start_x + (self.target_x - self.start_x) * (
+                    self.elapsed_time / ANIMATION_TIME
+                )
+                self.rect.y = self.start_y + (self.target_y - self.start_y) * (
+                    self.elapsed_time / ANIMATION_TIME
+                )
+        else:
+            self.rect.x = self.target_x
+            self.rect.y = self.target_y
+
+    def animate(self):
+        """Animate the tile"""
+        self.animation = True
+        self.elapsed_time = 0
+        self.start_x = self.rect.x
+        self.start_y = self.rect.y
+        self.target_x = self.position[0] * self.size
+        self.target_y = self.position[1] * self.size
 
 
 class ThumbnailGroup(pg.sprite.Group):
@@ -150,8 +170,8 @@ class Scroll(pg.sprite.Sprite):
 
     def __init__(self, max_scroll, *groups) -> None:
         super().__init__(*groups)
-        self.max_scroll = max_scroll
-        self.height = 380 / max_scroll
+        self.max_scroll = max(max_scroll, 1)
+        self.height = 380 / self.max_scroll
         self.at = 0
         self.rect = pg.Rect(380, 10, 15, self.height)
 

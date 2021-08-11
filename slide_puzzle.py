@@ -43,14 +43,12 @@ def select_board_size(screen):
     global clock
 
     screen.fill((0, 0, 0))
-    b1 = button(screen, (100, 50), "2x2")
-    b2 = button(screen, (200, 50), "3x3")
-    b3 = button(screen, (100, 150), "4x4")
-    b4 = button(screen, (200, 150), "5x5")
-    b5 = button(screen, (100, 150), "6x6")
-    b6 = button(screen, (200, 150), "7x7")
-    b7 = button(screen, (100, 250), "8x8")
-    b8 = button(screen, (200, 250), "9x9")
+    b2 = button(screen, (100, 50), "2x2")
+    b3 = button(screen, (200, 50), "3x3")
+    b4 = button(screen, (100, 150), "4x4")
+    b5 = button(screen, (200, 150), "5x5")
+    b6 = button(screen, (100, 250), "6x6")
+    b7 = button(screen, (200, 250), "7x7")
 
     while True:
         for event in pg.event.get():
@@ -58,22 +56,18 @@ def select_board_size(screen):
                 pg.quit()
                 raise SystemExit
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                if b1.collidepoint(pg.mouse.get_pos()):
-                    return 2
                 if b2.collidepoint(pg.mouse.get_pos()):
-                    return 3
+                    return 2
                 if b3.collidepoint(pg.mouse.get_pos()):
-                    return 4
+                    return 3
                 if b4.collidepoint(pg.mouse.get_pos()):
-                    return 5
+                    return 4
                 if b5.collidepoint(pg.mouse.get_pos()):
-                    return 6
+                    return 5
                 if b6.collidepoint(pg.mouse.get_pos()):
-                    return 7
+                    return 6
                 if b7.collidepoint(pg.mouse.get_pos()):
-                    return 8
-                if b8.collidepoint(pg.mouse.get_pos()):
-                    return 9
+                    return 7
 
         pg.display.update()
         clock.tick(30)
@@ -148,12 +142,12 @@ def main():
                     board_size = select_board_size(screen)
                     puzzle_image = PuzzleImage(board_image, board_size)
 
+        delta = clock.tick(30) / 1000
         screen.fill((0, 0, 0))
-        puzzle_image.update()
+        puzzle_image.update(delta)
         puzzle_image.draw(screen)
 
         pg.display.update()
-        clock.tick(30)
 
 
 if __name__ == "__main__":
